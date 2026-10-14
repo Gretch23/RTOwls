@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>RT Wise Owls Hunt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: a field-guide notebook — one column, a "life list" grid of owl slots, catch sheet slides up */
+:root{
+  --bg:#f3f1ec; --card:#ffffff; --ink:#1f1b24; --muted:#6b6470; --line:#ddd7d0;
+  --accent:#9d2235; --accent-ink:#ffffff; --rare:#2f6f8f; --legend:#b5832a; --student:#3e7b4f; --night:#26202c;
+  --display:"Bricolage Grotesque",ui-rounded,system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#17141b; --card:#221e27; --ink:#efeaf2; --muted:#a59cab; --line:#3a3340;
+  --accent:#e0566b; --accent-ink:#17141b; --rare:#6fb3d4; --legend:#e2b35c; --student:#7cc08e; --night:#0f0d12; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17141b; --card:#221e27; --ink:#efeaf2; --muted:#a59cab; --line:#3a3340;
+  --accent:#e0566b; --accent-ink:#17141b; --rare:#6fb3d4; --legend:#e2b35c; --student:#7cc08e; --night:#0f0d12; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--body)}
+.wrap{max-width:560px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.hero{display:flex;flex-direction:column;gap:10px}
+.hero h1{font-size:clamp(34px,9vw,48px);font-weight:800;line-height:1;letter-spacing:-.02em}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p{margin:0;color:var(--muted);max-width:46ch}
+.example{align-self:flex-start;font-size:12px;border:1px dashed var(--muted);color:var(--muted);border-radius:999px;padding:2px 10px}
+.venue{display:flex;gap:6px;flex-wrap:wrap}
+.venue button{font:600 14px var(--body);border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+.venue button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.progress{display:flex;flex-direction:column;gap:8px}
+.progress .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.progress strong{font:800 28px var(--display);font-variant-numeric:tabular-nums}
+.bar{height:10px;background:var(--line);border-radius:999px;overflow:hidden}
+.bar span{display:block;height:100%;background:var(--accent);width:0;transition:width .5s ease}
+.catch{display:flex;gap:8px}
+.catch input{flex:1;min-width:0;font:600 17px var(--body);padding:12px 14px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);text-transform:uppercase;letter-spacing:.06em}
+.catch input:focus{outline:none;border-color:var(--accent)}
+.btn{font:700 16px var(--body);border:0;border-radius:12px;padding:12px 18px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.btn:focus-visible,.venue button:focus-visible,.slot:focus-visible{outline:3px solid var(--rare);outline-offset:2px}
+.msg{min-height:1.5em;margin:-12px 0 0;font-size:14px;color:var(--muted)}
+.msg.bad{color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.slot{all:unset;box-sizing:border-box;cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.slot svg{width:64px;height:64px}
+.slot .name{font:700 15px/1.25 var(--display)}
+.slot .hint{font-size:13px;color:var(--muted);line-height:1.35}
+.slot.missing svg{opacity:.9}
+.tag{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid currentColor}
+.tag.common{color:var(--muted)} .tag.rare{color:var(--rare)} .tag.legendary{color:var(--legend)}
+.finish{background:var(--night);color:#f4eff6;border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:12px}
+.finish h2{font-size:26px}
+.finish p{margin:0;color:#cfc6d6}
+.finish .code{font:800 30px var(--display);letter-spacing:.08em;color:#f2c46b;font-variant-numeric:tabular-nums}
+.finish a.btn{text-decoration:none;align-self:flex-start;background:#f2c46b;color:#26202c}
+.finish.locked{opacity:.92}
+dialog{border:0;padding:0;border-radius:22px;background:var(--card);color:var(--ink);width:min(440px,calc(100% - 32px));box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(15,12,18,.55)}
+.sheet{padding:24px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.sheet svg{width:110px;height:110px;animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
+.sheet h3{font-size:26px}
+.sheet p{margin:0}
+@keyframes pop{from{transform:scale(.4) rotate(-12deg)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.sheet svg{animation:none}.bar span{transition:none}}
+footer{font-size:13px;color:var(--muted)}
+.savenote{margin:0;font-size:13px;color:var(--muted)}
+.spot{display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--line);padding-top:10px;width:100%;font-size:14px}
+.spot span{color:var(--muted)}
+.spot em{font-style:italic}
+.sheet{max-height:85vh;overflow-y:auto}
+.tag.student{color:var(--student)}
+.links{display:flex;flex-direction:column;gap:8px;width:100%}
+.links a{text-decoration:none;text-align:center}
+.btn.alt{background:var(--ink);color:var(--bg)}
+.btn.ghost{background:transparent;color:inherit;border:2px solid currentColor}
+.contact{width:100%;border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;font-size:15px}
+.contact .line{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.contact .val{font-weight:700;user-select:all;overflow-wrap:anywhere;min-width:0}
+.copy{font:700 13px var(--body);border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:4px 12px;cursor:pointer}
+.finish .contact{border-color:#4a4152}
+.finish .copy{background:transparent;color:#f4eff6;border-color:#6b6075}
+.tagline{font-weight:700;color:var(--accent)}
+
+
+[hidden]{display:none!important}
+img{max-width:100%}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow" id="programLine"></span>
+    <h1>Find the <em>Wise Owls</em>.<br>Win the swag.</h1>
+    <p id="intro"></p>
+    <span class="tagline">Share your hunt: #RTOwlHunt</span>
+  </header>
+
+  <div class="venue" role="group" aria-label="Where are you hunting?" id="venue"></div>
+
+  <section class="progress" aria-live="polite">
+    <div class="row"><span class="eyebrow">Your owl list</span><strong id="count">0/0</strong></div>
+    <div class="bar"><span id="bar"></span></div>
+    <p class="savenote">No need to save. Your owls are kept automatically as long as you come back on the same phone and browser (not a private or incognito tab).</p>
+  </section>
+
+  <form class="catch" id="catchForm" autocomplete="off">
+    <label for="codeInput" class="eyebrow" hidden>Owl word</label>
+    <input id="codeInput" placeholder="Type an owl's word" aria-label="Owl word">
+    <button class="btn" type="submit">Catch</button>
+  </form>
+  <p class="msg" id="msg">Found an owl? Type its word to catch it.</p>
+
+  <section class="grid" id="grid"></section>
+
+  <section class="finish locked" id="finish"></section>
+
+  <footer id="footer"></footer>
+</div>
+
+<dialog id="sheet"><div class="sheet" id="sheetBody"></div></dialog>
+
+<script>
+/* ============================================================
+   EDIT THIS BLOCK to reuse the hunt for a new event.
+   - code: the owl's word (letters, digits, dashes).
+   - colors: [filled eye + ear tufts, ringed eye].
+   - kind: hidden | rare | student | legendary
+       hidden/rare = laminated owl hidden at the venue, word on its flag
+       student/legendary = worn on a lanyard; the person shares the word when asked
+   - where: hint per venue, shown on the uncaught tile.
+   - links: buttons shown after the owl is caught.
+   ============================================================ */
+const GENA = { name:"Dr. Gena Vargas", title:"Graduate Program Director, Recreational Therapy",
+               email:"gena.vargas@temple.edu", phone:"215-204-7010" };
+const CONFIG = {
+  program: "RT Wise Owls · MS in Recreational Therapy · Temple University",
+  intro: "Wise Owls are hiding around ATRA. Hidden owls hold a flag with a code word. Others are worn on lanyards by Temple RT students and faculty, so ask them for their word. Each owl you catch reveals something about Temple's online MS in Recreational Therapy. Catch 6 to earn a prize.",
+  goal: 6,
+  hashtag: "#RTOwlHunt",
+  formUrl: "https://connect.temple.edu/register/?id=714ee103-cedd-440c-94a3-351db826b522",
+  venues: { atra: "ATRA conference" },
+  // States where current and former students live. Leave empty to hide the map button.
+  studentStates: [],
+  owls: [
+    { code:"ANYWHERE", colors:["#9D2235","#2B2730"], name:"RT Owls Learn Anywhere", kind:"hidden",
+      where:{ atra:"Where people refuel between sessions" },
+      fact:"The MS in Recreational Therapy is fully online. Live web-conference classes plus self-paced work mean you can study from wherever you live and work.",
+      showMap:true },
+    { code:"FLEX", colors:["#1F7A80","#9D2235"], name:"RT Owls Work & Learn", kind:"hidden",
+      where:{ atra:"Where your conference day begins" },
+      fact:"Go full time and finish in two years, including summers, or go part time with up to four years to finish. The program is built for working professionals.",
+      links:[{ label:"Scholarships & funding", url:"https://cph.temple.edu/student-life/scholarships" }] },
+    { code:"BUILD", colors:["#C8901F","#2B2730"], name:"RT Owls Make It Better", kind:"hidden",
+      where:{ atra:"Close to the Temple booth" },
+      fact:"Turn your course projects into real improvements at your own job. You build them with faculty support, so your coursework makes a difference now and builds your case for advancement." },
+    { code:"OUTCOMES", colors:["#3E7B4F","#C8901F"], name:"RT Owls Build the Evidence", kind:"hidden",
+      where:{ atra:"Where research is on display" },
+      fact:"Two evidence-based practice courses teach you to find, judge, and apply research to RT interventions. In the second, you create your own evidence-based protocol, ready to use in practice." },
+    { code:"LEAD", colors:["#2C4A7A","#E06A4E"], name:"RT Owls Lead", kind:"hidden",
+      where:{ atra:"Near where the biggest sessions gather" },
+      fact:"RT starts at the bachelor's level. The MS is how you move from practitioner to leader. Courses in administration and management and in evidence-based practice, plus electives like entrepreneurship and teaching in higher education, prepare you to supervise, build programs, and shape your organization." },
+    { code:"WELCOME", colors:["#6B3A7A","#1F7A80"], name:"Many Feathers, One Nest", kind:"hidden",
+      where:{ atra:"Somewhere people pass between sessions" },
+      fact:"Many feathers, one nest: our students come from psychology, nursing, special education, and more. Already a CTRS? You can tailor four electives to your interests. New to RT? A 560-hour supervised practicum prepares you for the NCTRC exam." },
+    { code:"SOAR", colors:["#1F7A80","#C8901F"], name:"RT Owls Soar", kind:"rare",
+      where:{ atra:"Where careers take flight" },
+      fact:"Our graduates can lead RT departments, build new programs, teach, and conduct research in hospitals, rehabilitation, community, and long-term care settings across the country.",
+      spotlightIntro:"Meet a few of them:",
+      // Add graduates here: { role:"Job title, setting, State", about:"One or two sentences from faculty." }
+      spotlights:[] },
+    { code:"PARLIAMENT", colors:["#E06A4E","#2C4A7A"], name:"RT Owls Flock Together", kind:"student",
+      where:{ atra:"Worn by a Temple RT student. Ask where they live and work." },
+      fact:"A group of owls is called a parliament. Ours spans the country: students join from states across the U.S., so your classmates become a national professional network.",
+      showMap:true },
+    { code:"HOOTENANNY", colors:["#9D2235","#6B3A7A"], name:"RT Owls Connect", kind:"student",
+      where:{ atra:"Worn by a Temple RT student. Ask what it's like to work and study at the same time." },
+      fact:"You just met a real Wise Owl. Our students balance the MS with jobs, families, and life, and they do it together. Want the same support? Our program director is one click away.",
+      contact:true },
+    { code:"LEGACY", colors:["#C8901F","#9D2235"], name:"RT Owls Shape the Field", kind:"legendary",
+      where:{ atra:"Worn by Temple RT faculty. Find the owl lanyard and ask." },
+      fact:"Temple's RT program is one of the oldest in the country. Our faculty conduct funded research and hold leadership roles in RT regionally and nationally. Come be part of our legendary program.",
+      links:[{ label:"Meet the faculty", url:"https://cph.temple.edu/academics/departments/health-rehabilitation-sciences/faculty#recreational-therapy" }] }
+  ]
+};
+/* ============================================================ */
+
+const KIND_LABEL = { hidden:"Hidden", rare:"Rare", student:"Student", legendary:"Legendary" };
+const KIND_CLASS = { hidden:"common", rare:"rare", student:"student", legendary:"legendary" };
+const STORE = "owlhunt:v1";
+let state = { caught:[], venue:Object.keys(CONFIG.venues)[0] };
+try{ const s = JSON.parse(localStorage.getItem(STORE)||"null"); if(s) state = Object.assign(state,s);}catch(e){}
+if(!CONFIG.venues[state.venue]) state.venue = Object.keys(CONFIG.venues)[0];
+function save(){ try{ localStorage.setItem(STORE, JSON.stringify(state)); }catch(e){} }
+
+const norm = s => String(s||"").trim().toUpperCase().replace(/[^A-Z0-9-]/g,"");
+const hint = o => o.where[state.venue];
+const activeOwls = () => CONFIG.owls.filter(o => hint(o));
+const esc = t => String(t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function owlSVG(o, caught){
+  const [a, b] = caught ? o.colors : ["var(--line)","var(--line)"];
+  const ink = caught ? "#1f1b24" : "var(--muted)";
+  return `<svg viewBox="0 0 100 100" aria-hidden="true">
+    <path d="M14 40 L11 12 L34 31Z" fill="${a}"/><path d="M86 40 L89 12 L66 31Z" fill="${b}"/>
+    <circle cx="32" cy="54" r="21" fill="${a}"/>
+    <circle cx="32" cy="54" r="8.5" fill="${caught?"#fff":"var(--card)"}"/>
+    <circle cx="68" cy="54" r="17" fill="${caught?"#fff":"var(--card)"}" stroke="${b}" stroke-width="8"/>
+    <circle cx="68" cy="54" r="${caught?7:5}" fill="${ink}"/>
+    <path d="M45 74 L55 74 L50 83Z" fill="${caught?"#f2c46b":"var(--muted)"}"/>
+  </svg>`;
+}
+
+function contactHTML(){
+  return `<div class="contact">
+    <strong>${esc(GENA.name)}</strong><span>${esc(GENA.title)}</span>
+    <div class="line"><span class="val">${esc(GENA.email)}</span><button class="copy" type="button" data-copy="${esc(GENA.email)}">Copy</button></div>
+    <div class="line"><span class="val">${esc(GENA.phone)}</span><button class="copy" type="button" data-copy="${esc(GENA.phone)}">Copy</button></div>
+  </div>`;
+}
+
+function completionCode(){
+  let h = 7; for(const c of state.caught.slice().sort()) for(const ch of c) h = (h*31 + ch.charCodeAt(0)) % 9973;
+  return "OWL-" + String(h).padStart(4,"0");
+}
+
+function render(){
+  document.getElementById("programLine").textContent = CONFIG.program;
+  document.getElementById("intro").textContent = CONFIG.intro;
+  const v = document.getElementById("venue"); v.innerHTML = "";
+  const venueKeys = Object.keys(CONFIG.venues);
+  v.hidden = venueKeys.length < 2;
+  for(const k of venueKeys){
+    const b = document.createElement("button"); b.type="button"; b.textContent=CONFIG.venues[k];
+    b.setAttribute("aria-pressed", String(k===state.venue));
+    b.onclick = () => { state.venue=k; save(); render(); };
+    v.appendChild(b);
+  }
+  const owls = activeOwls(), got = owls.filter(o => state.caught.includes(o.code)).length;
+  const goal = Math.min(CONFIG.goal, owls.length);
+  document.getElementById("count").textContent = `${got}/${owls.length}`;
+  document.getElementById("bar").style.width = (owls.length? got/owls.length*100 : 0) + "%";
+
+  const g = document.getElementById("grid"); g.innerHTML = "";
+  for(const o of owls){
+    const c = state.caught.includes(o.code);
+    const el = document.createElement("button");
+    el.className = "slot" + (c?"":" missing"); el.type = "button";
+    el.innerHTML = owlSVG(o,c) +
+      `<span class="tag ${KIND_CLASS[o.kind]}">${KIND_LABEL[o.kind]}</span>
+       <span class="name">${c ? esc(o.name) : "Uncaught owl"}</span>
+       <span class="hint">${c ? "Tap to read what you learned" : esc(hint(o))}</span>`;
+    el.onclick = () => c ? showOwl(o,false) : document.getElementById("codeInput").focus();
+    g.appendChild(el);
+  }
+
+  const f = document.getElementById("finish");
+  if(got >= goal){
+    f.classList.remove("locked");
+    f.innerHTML = `<span class="eyebrow" style="color:#cfc6d6">Hunt complete</span>
+      <h2>Congratulations! You've found ${got} owls!</h2>
+      <p>Connect with Dr. Gena Vargas or visit us at the Temple booth to collect your prize! Show this code:</p>
+      <span class="code">${completionCode()}</span>
+      ${contactHTML()}
+      <a class="btn" href="${CONFIG.formUrl}" target="_blank" rel="noopener">Request program info</a>
+      <p>Share your hunt: <strong>${esc(CONFIG.hashtag)}</strong></p>`;
+  } else {
+    f.classList.add("locked");
+    f.innerHTML = `<span class="eyebrow" style="color:#cfc6d6">Prize</span>
+      <h2>${goal-got} more owl${goal-got===1?"":"s"} to go.</h2>
+      <p>Catch ${goal} owls to earn a prize. Some owls are worn on lanyards by Temple RT students and faculty. Ask them for their word.</p>`;
+  }
+  wireCopy(f);
+}
+
+function wireCopy(root){
+  root.querySelectorAll("[data-copy]").forEach(b => b.onclick = async () => {
+    try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent = "Copied"; }
+    catch(e){
+      const r = document.createRange(); r.selectNodeContents(b.previousElementSibling);
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); b.textContent = "Selected";
+    }
+  });
+}
+
+function showOwl(o, fresh){
+  const spots = (o.spotlights||[]);
+  const linkBtns = (o.links||[]).map(l => `<a class="btn alt" href="${l.url}" target="_blank" rel="noopener">${esc(l.label)}</a>`);
+  // Map button appears once studentStates is filled in.
+  const body = owlSVG(o,true) +
+    `<span class="tag ${KIND_CLASS[o.kind]}">${fresh?"Caught · ":""}${KIND_LABEL[o.kind]}</span>
+     <h3>${esc(o.name)}</h3><p>${esc(o.fact)}</p>
+     ${spots.length ? `<p>${esc(o.spotlightIntro||"")}</p>` + spots.map(g=>`<div class="spot"><strong>${esc(g.role)}</strong><span>${esc(g.about)}</span></div>`).join("") : ""}
+     ${o.contact ? contactHTML() : ""}
+     ${linkBtns.length ? `<div class="links">${linkBtns.join("")}</div>` : ""}
+     <button class="btn" type="button" id="closeSheet">${fresh?"Keep hunting":"Close"}</button>`;
+  const sb = document.getElementById("sheetBody"); sb.innerHTML = body; wireCopy(sb);
+  const d = document.getElementById("sheet");
+  d.showModal ? d.showModal() : d.setAttribute("open","");
+  document.getElementById("closeSheet").onclick = () => d.close ? d.close() : d.removeAttribute("open");
+}
+
+function tryCatch(raw){
+  const code = norm(raw), msg = document.getElementById("msg");
+  if(!code) return;
+  const o = CONFIG.owls.find(x => x.code === code);
+  if(!o){ msg.textContent = `"${code}" isn't an owl word. Check the spelling and try again.`; msg.className="msg bad"; return; }
+  if(state.caught.includes(code)){ msg.textContent = `You already caught ${o.name}.`; msg.className="msg"; showOwl(o,false); return; }
+  state.caught.push(code); save(); render();
+  msg.textContent = `You caught ${o.name}!`; msg.className="msg";
+  showOwl(o,true);
+}
+
+document.getElementById("catchForm").addEventListener("submit", e => {
+  e.preventDefault(); const i = document.getElementById("codeInput"); tryCatch(i.value); i.value="";
+});
+render();
+</script>
+
+</body>
+</html>
